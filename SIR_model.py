@@ -8,9 +8,6 @@ I0 = 1
 R0 = 0
 S0 = POPULATION - I0 - R0
 
-# Vecteur représentant les 3 conditions initiales.
-y0 = S0, I0, R0
-
 # Les taux
 
 # BETA correspond au taux d'infection / probabilité d'être infecté après avoir été en contact avec un individu infecté
@@ -21,21 +18,24 @@ GAMMA = 0.05
 
 
 # Les variations des grandeurs S(t), I(t) et R(t) => Dérivées ds/dt, di/dt, dr/dt
-def variation(y, t, beta, gamma):
-    s, i, r = y
-    dsdt = - beta * s * i
-    didt = beta * s * i - gamma * i
+def variation(y, t, beta, gamma, n):
+    s = y[0]
+    i = y[1]
+    r = y[2]
+    dsdt = - beta * s * i / n
+    didt = beta * s * i / n - gamma * i
     drdt = gamma * i
-    return dsdt, didt, drdt
+    return [dsdt, didt, drdt]
 
 
-# Creation des tableaux
 
 # Tableau représentant l'échelle du temps
-t = np.linspace(0, 50)
+t = np.linspace(0, 90, 90)
+print(t)
 
-# Intégration du système par rapport au temps
-res = odeint(variation, y0, t, args=(BETA, GAMMA))
+# Intégration du système
+sir = odeint(variation, [S0, I0, R0], t, args=(BETA, GAMMA, POPULATION))
+print(sir)
 
 # Affichage des courbes
 
@@ -44,9 +44,9 @@ plt.title("Evolution de la taille des 3 catégories de personnes au cours du tem
 plt.xlabel("Temps (en jours)")
 plt.ylabel("Population")
 
-plt.plot(t, res[:, 0], label="Sains")
-plt.plot(t, res[:, 1], label="Infectés")
-plt.plot(t, res[:, 2], label="Rétablis")
+plt.plot(t, sir[:, 0], label="Sains")
+plt.plot(t, sir[:, 1], label="Infectés")
+plt.plot(t, sir[:, 2], label="Rétablis")
 
 plt.legend()
 plt.show()
