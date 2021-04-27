@@ -21,13 +21,13 @@ def sir(delta, tf, beta, gamma, population, y):
     deriv_r = gamma * i
 
     # Méthode d'Euler
-    for i in range(1, int(tf // delta) + 1):
-        x = x + delta * i
+    for k in range(1, int(tf // delta) + 1):
+        x = x + delta
 
         # Calcul approximatif des images s, i et r, connaissant les dérivées
         s = s + delta * deriv_s
         i = i + delta * deriv_i
-        r = r + delta * deriv_s
+        r = r + delta * deriv_r
         t.append(x)
         y.append([s, i, r])
 
@@ -39,7 +39,7 @@ def sir(delta, tf, beta, gamma, population, y):
     return t, y
 
 
-sir_euler_method = sir(0.5, 90, consts.BETA, consts.GAMMA, consts.POPULATION, [consts.S0, consts.I0, consts.R0])
+sir_euler_method = sir(0.001, 90, consts.BETA, consts.GAMMA, consts.POPULATION, [consts.S0, consts.I0, consts.R0])
 t, y = sir_euler_method
 s = [i[0] for i in y]
 i = [i[1] for i in y]
@@ -54,6 +54,6 @@ plt.plot(t, s, ":", label="Sains")
 plt.plot(t, i, ":", label="Infectés")
 plt.plot(t, r, ":", label="Rétablis")
 
-#plt.xlim([0, 90])
+plt.legend()
 plt.show()
    
