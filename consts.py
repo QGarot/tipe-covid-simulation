@@ -1,8 +1,8 @@
 # Conditions initiales sur la population
-POPULATION = 1000
-I0 = 1
+
+I0 = 1/1000
 R0 = 0
-S0 = POPULATION - I0 - R0
+S0 = 999/1000
 
 # Les taux
 

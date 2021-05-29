@@ -1,9 +1,10 @@
 import consts
-import numpy as np
 import matplotlib.pyplot as plt
 
 # Sains
-def sir(delta, tf, beta, gamma, population, y):
+
+
+def sir(points, tf, beta, gamma, y):
 
     # CI
     x = 0
@@ -16,12 +17,15 @@ def sir(delta, tf, beta, gamma, population, y):
     y = [[s, i, r]]
 
     # Dérivées au points 0
-    deriv_s = - beta * i * s / population
-    deriv_i = beta * i * s / population - gamma * i
+    deriv_s = - beta * i * s
+    deriv_i = beta * i * s - gamma * i
     deriv_r = gamma * i
 
+    delta = tf / points
+
     # Méthode d'Euler
-    for k in range(1, int(tf // delta) + 1):
+    for k in range(1, points + 1):
+        print(k)
         x = x + delta
 
         # Calcul approximatif des images s, i et r, connaissant les dérivées
@@ -32,14 +36,15 @@ def sir(delta, tf, beta, gamma, population, y):
         y.append([s, i, r])
 
         # Dérivées aux points de coordonnées (x, s), (x, i) et (x, r)
-        deriv_s = - beta * i * s / population
-        deriv_i = beta * i * s / population - gamma * i
+        deriv_s = - beta * i * s
+        deriv_i = beta * i * s - gamma * i
         deriv_r = gamma * i
 
+    print(s, i, r)
     return t, y
 
 
-sir_euler_method = sir(0.001, 90, consts.BETA, consts.GAMMA, consts.POPULATION, [consts.S0, consts.I0, consts.R0])
+sir_euler_method = sir(100, 90, consts.BETA, consts.GAMMA, [consts.S0, consts.I0, consts.R0])
 t, y = sir_euler_method
 s = [i[0] for i in y]
 i = [i[1] for i in y]
@@ -50,10 +55,8 @@ plt.title("Evolution de la taille des 3 catégories de personnes au cours du tem
 plt.xlabel("Temps (en jours)")
 plt.ylabel("Population")
 
-plt.plot(t, s, ":", label="Sains")
-plt.plot(t, i, ":", label="Infectés")
-plt.plot(t, r, ":", label="Rétablis")
+plt.scatter(t, s, marker=".")
+plt.scatter(t, i, marker=".")
+plt.scatter(t, r, marker=".")
 
-plt.legend()
 plt.show()
-   
