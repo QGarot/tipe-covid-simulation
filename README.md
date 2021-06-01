@@ -1,4 +1,4 @@
-# Limitation de la propagation d’un virus dans le cas d’une épidémie mondiale
+# Limitation de la propagation d’un virus dans le cadre d’une pandémie
 
 ### I.	Problématiques
 
