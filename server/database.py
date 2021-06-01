@@ -1,14 +1,26 @@
 import mysql.connector
-from mysql.connector import MySQLConnection, errorcode
+from mysql.connector.cursor import MySQLCursor
 
 
-def connection(host: str, user: str, password: str, dbname: str) -> MySQLConnection:
-    try:
-        return mysql.connector.connect(user=user, password=password, host=host, database=dbname)
-    except mysql.connector.Error as error:
-        if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Mauvais utilisateur ou mauvais mot de passe")
-        elif error.errno == errorcode.ER_BAD_DB_ERROR:
-            print("La base de données indiquées n'existe pas.")
-        else:
-            print(error)
+class Database:
+    def __init__(self, host: str, user: str, password: str, database_name: str) -> None:
+        self.connection = mysql.connector.connect(
+            host=host,
+            port=3306,
+            user=user,
+            database=database_name,
+            password=password
+        )
+
+    def get_cursor(self) -> MySQLCursor:
+        return self.connection.cursor()
+
+    def insert(self, sql: str) -> None:
+        self.get_cursor().execute(sql)
+        self.connection.commit()
+        return None
+
+    def query(self, sql: str) -> list:
+        self.get_cursor().execute(sql)
+        result = self.get_cursor().fetchall()
+        return result
