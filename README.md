@@ -1,18 +1,3 @@
-# Limitation de la propagation d’un virus dans le cadre d’une pandémie
-
-### I.	Problématiques
-
-1.	Comment pouvons-nous limiter la transmission d’une épidémie grâce aux avancées numériques ?
-2.	Quels outils numériques pouvons-nous proposer afin de restreindre la diffusion d’un virus ?
-
-### II.	Objectifs du TIPE
-
-1.	Modéliser de manière numérique une épidémie selon plusieurs modèles.
-2.	Simuler le phénomène de propagation d’un virus au sein d’un espace selon différentes conditions.
-3.	Se baser sur les modélisations et les simulations réalisées afin de proposer et mettre au point un outil informatique permettant (par exemple) aux gouvernements de gérer une crise sanitaire.
-4.	Proposer une seconde modélisation en considérant une portion de la population possédant cette application et mettre en évidence les conséquences sur la transmission du virus.
-
-### III.	Positionnement thématique
-
-- Informatique *(Informatique pratique)*
-- Mathématiques *(Algèbre relationnelle, mathématiques appliquées)*
+## Impact des outils numériques sur le contrôle d’une pandémie
+Ce sujet porte sur le développement d’un outil numérique qui permettrait aux différents gouvernements de prendre des mesures préventives contre la propagation de la COVID19 ainsi que sur les modélisations et la simulation d’une pandémie, ce qui s’inscrit dans le thème Santé, prévention.
+Etant intéressé par le développement informatique, j’ai à coeur de travailler sur ce projet qui est concret et qui répond à une véritable problématique d’actualité. Il me paraît important de montrer l’utilité des outils numériques sur la gestion d’une pandémie.
