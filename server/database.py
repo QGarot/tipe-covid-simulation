@@ -30,20 +30,25 @@ class Database:
         """
         return self.cursor
 
-    def insert(self, sql: str) -> None:
+    def set(self, sql: str, values: tuple) -> None:
         """
-        Permet d'éxécuter une requête SQL pour insérer une ligne dans une table.
+        Permet d'éxécuter une requête SQL pour modifier table.
+        
+        - INSERT
+        - UPDATE
+        - DELETE
 
+        :param values: Valeurs
         :param sql: Requête SQL
         :return: None
         """
-        self.get_cursor().execute(sql)
+        self.get_cursor().execute(sql, values)
         self.connection.commit()
         return None
 
-    def query(self, sql: str) -> list:
+    def get(self, sql: str) -> list:
         """
-        Retourne une liste correspondant aux enregistrements retournés par la requête.
+        Retourne une liste correspondant aux enregistrements retournés par la requête (généralement de type SELECT).
         Cette liste contient des n-uplets si n attributs sont sélectionnés dans la requête.
 
         :param sql: Requête SQL
