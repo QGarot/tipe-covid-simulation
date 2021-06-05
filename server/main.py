@@ -1,4 +1,5 @@
 import server.database
+import server.user
 
 db = None
 try:
@@ -10,12 +11,6 @@ except:
 
 # Quelques tests
 if db is not None:
-    # SELECT
-    print(db.get_cursor())
-    test = db.query("SELECT * FROM contamines")
-    print(test)
-    print(db.get_cursor())
-
-    # INSERT
-    db.insert("INSERT INTO contamines (nom, prenom, age, nationalite) VALUES ('Jean', 'Pascal', 36, 'Française')")
-    print(db.get_cursor())
+    # Nouvel utilisateur
+    user1 = server.user.User("GAROT", "Quentin", 19, "Française")
+    user1.insert_db(db)
