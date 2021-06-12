@@ -4,6 +4,7 @@ import time
 
 # Classes représentant un individu
 
+
 class Person:
     def __init__(self, x, y, status):
         self.x = x
@@ -44,10 +45,10 @@ class Person:
             self.draw_zone_contamination(canvas)
 
     def draw_zone_contamination(self, canvas):
-        x0 = self.x - consts.contamination_radius
-        y0 = self.y - consts.contamination_radius
-        x1 = self.x + consts.contamination_radius
-        y1 = self.y + consts.contamination_radius
+        x0 = self.x - consts.CONTAMINATION_RADIUS
+        y0 = self.y - consts.CONTAMINATION_RADIUS
+        x1 = self.x + consts.CONTAMINATION_RADIUS
+        y1 = self.y + consts.CONTAMINATION_RADIUS
         self.zone_contamination = canvas.create_oval(x0, y0, x1, y1, outline="black", width=2)
 
     def color(self):
@@ -64,7 +65,7 @@ class Person:
             return "#FF2F2F"
         else:
             return "#F3B33A"
-    
+
 
 # Création d'une fenêtre
 window = tk.Tk()
