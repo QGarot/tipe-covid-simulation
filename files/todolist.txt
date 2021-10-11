@@ -1,0 +1,17 @@
+- Creer une fenetre pour la simulation :
+
+-> Modéliser les individus par des points colorés : (rouge pour infecté, verts pour sain, orange pour rétablis)
+-> Animer les points aléatoirement de manière à provoquer des "Contact" (ie des infections)
+-> Infection : distance minimale (5m) franchie pendant une certaine durée (revoir les normes proposées sur TousAntiCovid)
+-> En cas d'infection : creer un objet de type contact pour enregistrer les informations des individus : elles seront ainsi sauvegardées
+   dans la base de données.
+
+- Exploiter les informations de la base de données :
+
+-> Pouvoir determiner les tranches de la populations qui sont les plus exposées aux risques. Détermination à l'aide de plusieurs criteres :
+   Age, profession, poids, sexe, allergies, etc etc...
+
+
+
+
+- Evaluer l'impact de cette application sur le coefficient Beta (taux d'infection) du modele SIR
