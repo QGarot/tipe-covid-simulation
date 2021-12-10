@@ -1,14 +1,36 @@
+import math
+
+
 class Point:
     """
     Cette classe modélise un individu par un cercle coloré.
     """
-    def __init__(self, x, y, color, canvas):
+    def __init__(self, x, y, diameter, color, canvas):
         self.x = x
         self.y = y
         self.color = color
         self.canvas = canvas
-        self.diameter = 20
+        self.diameter = diameter
         self.id = None
+
+    def distance(self, point):
+        """
+        Retourne la distance séparant le point indiqué en paramètre et CE point (désigné par l'objet self)
+        :param point:
+        :return:
+        """
+        dx = point.x - self.x
+        dy = point.y - self.y
+        return math.sqrt(dx ** 2 + dy ** 2)
+
+    def get_h(self, attractor_point):
+        """
+        Retourne l'insatisfaction. L'insatisfaction d'un individu correspond à la distance qu'il lui reste à
+        parcourir pour atteindre le point attracteur.
+        :return:
+        """
+
+        return self.distance(attractor_point)
 
     def move(self, dx, dy):
         """
@@ -42,7 +64,7 @@ class Point:
 
     def draw(self):
         """
-        Dessine le cercle représentant l'individu dans le canvas sélectionné
+        Dessine le disque représentant l'individu dans le canvas sélectionné
         :return:
         """
         x0 = self.get_x() - self.get_diameter()/2
