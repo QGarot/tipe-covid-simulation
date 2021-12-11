@@ -1,3 +1,1 @@
 ## Impact des outils numériques sur le contrôle d’une pandémie
-Ce sujet porte sur le développement d’un outil numérique qui permettrait aux différents gouvernements de prendre des mesures préventives contre la propagation de la COVID19 ainsi que sur les modélisations et la simulation d’une pandémie, ce qui s’inscrit dans le thème Santé, prévention.
-Etant intéressé par le développement informatique, j’ai à coeur de travailler sur ce projet qui est concret et qui répond à une véritable problématique d’actualité. Il me paraît important de montrer l’utilité des outils numériques sur la gestion d’une pandémie.
