@@ -16,13 +16,14 @@ class Simulation:
         self.window = tk.Tk()
         self.window.title("Simulation de la propagation d'un virus")
         self.canvas = tk.Canvas(self.window, width=700, height=700)
-        self.active = tk.Button(self.window, text="Animation", command=None)
+        self.button = tk.Button(self.window, text="Lancer l'animation", command=self.run_animation)
+        self.button.pack()
 
         # Paramètres de la simulation
-        self.points = []
         self.standard_contact = strd_contact  # Conditions nécessaires pour décrire un contact
         self.point_data = point_data  # Informations relatives à un point (son diamètre, sa couleur...)
         self.attractor_point = None
+        self.points = []
 
     def generate_color(self):
         """
@@ -50,8 +51,8 @@ class Simulation:
         :return: None
         """
         (x0, y0) = self.generate_coord()
-        attractor_point = Point(x0, y0, 10, "black", self.canvas)
-        attractor_point.draw()
+        self.attractor_point = Point(x0, y0, 10, "black", self.canvas)
+        self.attractor_point.draw()
 
     def put_points(self, n):
         """
@@ -59,13 +60,25 @@ class Simulation:
         :param n:
         :return: None
         """
-        point = None
         diameter = self.point_data["diameter"]
-        for i in range(n):
+        self.create_attractor_point()
+        for i in range(1, n + 1):
             (x, y) = self.generate_coord()
             point = Point(x, y, diameter, self.generate_color(), self.canvas)
-            self.points.append(point)
             point.draw()
+            self.points.append(point)
+            # point.draw_vector(point.get_vector(self.attractor_point))
+
+    def run_animation(self):
+        """
+        TODO: Terminer l'animation.
+        :return:
+        """
+        print("Test " + str(self.canvas.find_all()))
+        #for point in self.points:
+        #    point.move_to(self.attractor_point)
+        self.points[2].move_to(self.attractor_point)
+        self.canvas.after(10, self.run_animation)
 
     def display(self):
         self.canvas.pack()
