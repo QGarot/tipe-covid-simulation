@@ -12,6 +12,7 @@ class Point:
         self.canvas = canvas
         self.diameter = diameter
         self.id = None
+        self.on_attractor = False
 
     def get_vector(self, point):
         """
@@ -53,17 +54,30 @@ class Point:
 
         return self.distance(point0)
 
-    def move_to(self, point):
+    def move_to(self, vector, attractor_point):
         """
-        Déplace le point dans la direction de celui indiqué en paramètre.
+        Translation du point selon le vecteur entré en paramètre
         :param point:
         :return:
         """
-        self.canvas.delete(self.id)
-        (dx, dy) = self.get_vector(point)
-        self.x = self.x + dx
-        self.y = self.y + dy
-        self.draw()
+
+        x0 = attractor_point.get_x() - attractor_point.get_diameter()/2
+        y0 = attractor_point.get_y() - attractor_point.get_diameter()/2
+        x1 = attractor_point.get_x() + attractor_point.get_diameter()/2
+        y1 = attractor_point.get_y() + attractor_point.get_diameter()/2
+
+        if self.id in self.canvas.find_overlapping(x0, y0, x1, y1):
+            self.on_attractor = True
+        else:
+            # On supprime le point ...
+            self.canvas.delete(self.id)
+
+            # ... on calcule les nouvelles coordonnées ...
+            self.x = self.x + vector[0]
+            self.y = self.y + vector[1]
+
+            # ... pour ensuite le redessiner avec les nouvelles coordonnées
+            self.draw()
 
     def get_diameter(self):
         """

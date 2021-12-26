@@ -24,6 +24,8 @@ class Simulation:
         self.point_data = point_data  # Informations relatives à un point (son diamètre, sa couleur...)
         self.attractor_point = None
         self.points = []
+        self.vectors = []  # Contient les vecteurs déplacement de chaque point de la simulation.
+                           # Il sont unitaires, dirigé et orienté vers le point attracteur.
 
     def generate_color(self):
         """
@@ -67,18 +69,33 @@ class Simulation:
             point = Point(x, y, diameter, self.generate_color(), self.canvas)
             point.draw()
             self.points.append(point)
-            # point.draw_vector(point.get_vector(self.attractor_point))
+            self.vectors.append(point.get_vector(self.attractor_point))
+            #point.draw_vector(point.get_vector(self.attractor_point))
+
+    def attractor_point_zone(self):
+        x0 = self.attractor_point.get_x() - self.attractor_point.get_diameter()/2
+        y0 = self.attractor_point.get_y() - self.attractor_point.get_diameter()/2
+        x1 = self.attractor_point.get_x() + self.attractor_point.get_diameter()/2
+        y1 = self.attractor_point.get_y() + self.attractor_point.get_diameter()/2
+
+        return x0, y0, x1, y1
 
     def run_animation(self):
         """
         TODO: Terminer l'animation.
+        Déplacer tous les points vers le point attracteur tant qu'ils n'y sont pas.
         :return:
         """
-        print("Test " + str(self.canvas.find_all()))
-        #for point in self.points:
-        #    point.move_to(self.attractor_point)
-        self.points[2].move_to(self.attractor_point)
-        self.canvas.after(10, self.run_animation)
+        for i in range(len(self.points)):
+            if not self.points[i].on_attractor:
+                current_point = self.points[i]
+                current_vector = self.vectors[i]
+                current_point.move_to(current_vector, self.attractor_point)
+
+        # Si la longueur de la liste des éléments qui touchent le point attracteur est strictement plus petites que le nombre de points, recommencer...
+        x0, y0, x1, y1 = self.attractor_point_zone()
+        if len(self.canvas.find_overlapping(x0, y0, x1, y1)) < len(self.points):
+            self.canvas.after(10, self.run_animation)
 
     def display(self):
         self.canvas.pack()
