@@ -1,6 +1,6 @@
 ## Impact des outils numériques sur le contrôle d’une pandémie
 
-### Modèle SIR
+### I. Modèle SIR
 
 **Fichiers contenant la modélisation SIR :**
 * [euler_method.py](https://github.com/QGarot/covid-simulation/blob/master/euler_method.py)
@@ -12,14 +12,14 @@ fonction du temps.
 
 ---
 
-### Simulation
+### II. Simulation (d'un phénomène de foule)
 
 On considère une région contenant n individus représentés par des points colorés (rouge pour un individu contaminé,
 vert pour un individu sain et orange pour un individu rétabli).
 
 Cette simulation a pour objectif de représenter un phénomène de foule.
-Pour cela, on représente par un "point attracteur" ce que pourrait être un concert, un marché de Noel, une école ou tout
-tout autre lieu/événement pouvant être à l'origine d'un rassemblement de personnes
+Pour cela, on représente par un "point attracteur" ce que pourrait être un concert, un marché de Noël, une école ou tout
+autre lieu/événement pouvant être à l'origine d'un rassemblement de personnes
 conséquent. Ainsi, tous les points se dirigeront vers ce point attracteur, et on mettra en évidence la transmission du
 virus par des modifications de couleur (par exemple, si un individu sain entre en contact avec un individu infecté, le
 point qui le représente deviendra rouge).
@@ -39,7 +39,7 @@ point qui le représente deviendra rouge).
 
 ---
 
-### Sauvegarde
+### Sauvegarde de données
 
 Objectif : pouvoir déterminer les tranches de la population les plus exposées aux risques.
 
