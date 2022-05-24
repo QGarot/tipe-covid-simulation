@@ -1,4 +1,4 @@
-class HealthData:
+class HealthDataUser:
     def __init__(self):
         """
         Cette classe permet de générer pour tout individu un objet contenant les données de santé essentielles.
@@ -36,6 +36,19 @@ class HealthData:
             "socio_professional_category": None,
         }
 
+    def test(self, db):
+        """
+        générer la structure de la classe grace à la bdd :
+        :return:
+        """
+
+        data_types_id = [i for i in db.get("SELECT id FROM donnee_de_sante_categories")]
+        for id in data_types_id:
+            data = db.get("SELECT nom FROM données_de_sante WHERE categorie = " + str(id))
+            type = {}
+            for name in data:
+                type[name] = None
+
     def generate(self):
         """
         TODO:
@@ -68,8 +81,27 @@ class HealthData:
         :param db:
         :return:
         """
+
+        data_id = 1
+
+        # Liste de tuples de la forme (utilisateur_id, donnee_id, valeur, info_supplémentaire).
+        values = []
+
         # Insertion des valeurs correspondant au type1
+        for value in self.type1.values():
+            values.append((self.user_id, data_id, value, ""))
+            data_id = data_id + 1
+
         # Insertion des valeurs correspondant au type2
+        for value in self.type2.values():
+            values.append((self.user_id, data_id, value, ""))
+            data_id = data_id + 1
+
         # Insertion des valeurs correspondant au type3
-        pass
+        for value in self.type3.values():
+            values.append((self.user_id, data_id, value, ""))
+            data_id = data_id + 1
+
+        request = "INSERT INTO users " + self.get_db_attributes() + " VALUES (%s, %s, %s, %s)"
+        db.set()
 

@@ -1,4 +1,5 @@
 import math
+from random import random
 
 
 class Point:
@@ -12,7 +13,27 @@ class Point:
         self.canvas = canvas
         self.diameter = diameter
         self.id = None
-        self.on_attractor = False
+        self.contamination = 0
+        self.neighbors = []
+
+    def add_neighbor(self, point):
+        """
+        Pour simplifier, on considère que si un point devient voisin d'un autre, alors il le reste jusqu'à la fin de
+        la simulation (supposition cohérente puisque les points bougent à la même vitesse vers la même destination).
+        :param point:
+        :return:
+        """
+        if point not in self.neighbors:
+            self.neighbors.append(point)
+
+    def is_contaminated(self):
+        return self.color == "red"
+
+    def is_healthy(self):
+        return self.color == "green"
+
+    def is_recovered(self):
+        return self.color == "orange"
 
     def get_vector(self, point):
         """
@@ -23,61 +44,44 @@ class Point:
         """
         dx = point.x - self.x
         dy = point.y - self.y
-        norm = self.distance(point, distance_type="a")
+        norm = self.distance(point)
 
         return dx/norm, dy/norm
 
-    def draw_vector(self, vector):
-        self.canvas.create_line(self.x, self.y, self.x + vector[0], self.y + vector[1], width=2, fill="black", arrow="last")
-
-    def distance(self, point, distance_type="b"):
+    def distance(self, point):
         """
         Retourne la distance séparant le point indiqué en paramètre et CE point (désigné par l'objet self)
-        ATTENTION :
-            Si distance_type = "a", ce n'est pas la distance séparant les centres des deux disques qui est
-            calculée, mais la plus petite distance séparant leurs extrémités.
         """
         dx = point.x - self.x
         dy = point.y - self.y
         dist = math.sqrt(dx ** 2 + dy ** 2)
-        if distance_type == "a":
-            return dist - self.diameter
-        else:
-            return dist
+        return dist
 
-    def get_h(self, point0):
+    def is_in_ball(self, center, radius):
         """
-        Retourne l'insatisfaction. L'insatisfaction d'un individu correspond à la distance qu'il lui reste à
-        parcourir pour atteindre le point attracteur, indiqué en paramètre.
+        Vérifie si le point self est dans la boule définie par son centre et son rayon.
+        :param center:
+        :param radius:
         :return:
         """
+        return center.distance(self) <= radius
 
-        return self.distance(point0)
+    def is_on_point(self, point):
+        radius = point.get_diameter() / 2
+        return self.is_in_ball(point, radius)
 
-    def move_to(self, vector, attractor_point):
+    def move(self, vector):
         """
         Translation du point selon le vecteur entré en paramètre
-        :param point:
+        :param vector:
         :return:
         """
+        # On met à jour ses nouvelles coordonnées
+        self.x = self.x + vector[0]
+        self.y = self.y + vector[1]
 
-        x0 = attractor_point.get_x() - attractor_point.get_diameter()/2
-        y0 = attractor_point.get_y() - attractor_point.get_diameter()/2
-        x1 = attractor_point.get_x() + attractor_point.get_diameter()/2
-        y1 = attractor_point.get_y() + attractor_point.get_diameter()/2
-
-        if self.id in self.canvas.find_overlapping(x0, y0, x1, y1):
-            self.on_attractor = True
-        else:
-            # On supprime le point ...
-            self.canvas.delete(self.id)
-
-            # ... on calcule les nouvelles coordonnées ...
-            self.x = self.x + vector[0]
-            self.y = self.y + vector[1]
-
-            # ... pour ensuite le redessiner avec les nouvelles coordonnées
-            self.draw()
+        # On déplace le point (dx <- vector[0] ; dy <- vector[1])
+        self.canvas.move(self.id, vector[0], vector[1])
 
     def get_diameter(self):
         """
@@ -108,4 +112,25 @@ class Point:
         y0 = self.get_y() - self.get_diameter()/2
         x1 = self.get_x() + self.get_diameter()/2
         y1 = self.get_y() + self.get_diameter()/2
+
         self.id = self.canvas.create_oval(x0, y0, x1, y1, fill=self.get_color())
+
+    def change_color(self, color):
+        self.color = color
+        self.canvas.itemconfig(self.id, fill=color)
+
+    def contaminate(self, beta):
+        """
+        TODO: Vérifier si le point a déjà été susceptible d'etre contaminé par le même individu.
+        Cette fonction modélise la contamination du point.
+        :return:
+        """
+        # On ne contamine que les individus sains...
+        if self.is_healthy():
+            k = random()
+            # ... selon une probabilité beta
+            if k <= beta:
+                self.change_color("red")
+                print(str(self.id) + " a été contaminé !")
+            else:
+                print(str(self.id) + " n'a pas été contaminé !")

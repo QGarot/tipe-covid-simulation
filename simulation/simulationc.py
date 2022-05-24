@@ -27,6 +27,20 @@ class Simulation:
         self.vectors = []  # Contient les vecteurs déplacement de chaque point de la simulation.
                            # Il sont unitaires, dirigé et orienté vers le point attracteur.
 
+    def SIR_data(self):
+        s = 0
+        i = 0
+        r = 0
+        for point in self.points:
+            if point.is_contaminated():
+                i = i + 1
+            elif point.is_healthy():
+                s = s + 1
+            else:
+                r = r + 1
+
+        return s, i, r
+
     def generate_color(self):
         """
         Génère aléatoirement une couleur parmi le rouge le vert et le orange.
@@ -37,13 +51,14 @@ class Simulation:
 
     def generate_coord(self):
         """
-        Rtourne une coordonnée aléatoire pour un point de la fenêtre (contraintes en fonctions des dimensions
+        Retourne des coordonnées aléatoires pour un point de la fenêtre (contraintes en fonction des dimensions
         de la fenêtre)
         :return: tuple sous la forme (x, y)
         """
         diameter = self.point_data["diameter"]  # Récupération du diamètre d'un point
         x = int(random.uniform(diameter, self.width - diameter))
         y = int(random.uniform(diameter, self.height - diameter))
+
         return x, y
 
     def create_attractor_point(self):
@@ -53,7 +68,7 @@ class Simulation:
         :return: None
         """
         (x0, y0) = self.generate_coord()
-        self.attractor_point = Point(x0, y0, 10, "black", self.canvas)
+        self.attractor_point = Point(x0, y0, self.point_data["diameter_attractor"], "black", self.canvas)
         self.attractor_point.draw()
 
     def put_points(self, n):
@@ -64,21 +79,33 @@ class Simulation:
         """
         diameter = self.point_data["diameter"]
         self.create_attractor_point()
-        for i in range(1, n + 1):
+        for i in range(n):
+            # On génère de manière aléatoire des coordonnées
             (x, y) = self.generate_coord()
+
+            # On crée le point pour ensuite le dessiner dans la fenêtre
             point = Point(x, y, diameter, self.generate_color(), self.canvas)
             point.draw()
+            # point.draw_vector(point.get_vector(self.attractor_point))
+
+            # On met à jour les listes caractérisant la simulation
             self.points.append(point)
             self.vectors.append(point.get_vector(self.attractor_point))
-            #point.draw_vector(point.get_vector(self.attractor_point))
 
-    def attractor_point_zone(self):
-        x0 = self.attractor_point.get_x() - self.attractor_point.get_diameter()/2
-        y0 = self.attractor_point.get_y() - self.attractor_point.get_diameter()/2
-        x1 = self.attractor_point.get_x() + self.attractor_point.get_diameter()/2
-        y1 = self.attractor_point.get_y() + self.attractor_point.get_diameter()/2
+        print("-----------------  Début de la simulation...  -----------------")
 
-        return x0, y0, x1, y1
+    def define_neighbors(self, point0):
+        """
+        Met à jour la liste des voisins de point0.
+        Un point est considéré comme voisin de point0 s'il est situé à une distance inférieure à la distance de contact
+        de point0.
+        :param point0:
+        :return:
+        """
+        contact_distance = self.standard_contact["distance"]
+        for point in self.points:
+            if point.is_in_ball(point0, contact_distance * 20):
+                point0.add_neighbor(point)
 
     def run_animation(self):
         """
@@ -86,16 +113,30 @@ class Simulation:
         Déplacer tous les points vers le point attracteur tant qu'ils n'y sont pas.
         :return:
         """
-        for i in range(len(self.points)):
-            if not self.points[i].on_attractor:
-                current_point = self.points[i]
-                current_vector = self.vectors[i]
-                current_point.move_to(current_vector, self.attractor_point)
+        print("***********")
+        all_point_on_attractor = True
+        n = len(self.points)
+        for i in range(n):
+            point, vector = self.points[i], self.vectors[i]
 
-        # Si la longueur de la liste des éléments qui touchent le point attracteur est strictement plus petites que le nombre de points, recommencer...
-        x0, y0, x1, y1 = self.attractor_point_zone()
-        if len(self.canvas.find_overlapping(x0, y0, x1, y1)) < len(self.points):
+            # 1) Si le point d'indice i n'est pas dans la zone du point attracteur, le faire avancer dans sa direction.
+            if not point.is_on_point(self.attractor_point):
+                point.move(vector)
+                all_point_on_attractor = False
+
+            # 2) Si le point d'indice i est rouge, mettre les points voisins en rouge sous certaines conditions...
+            if point.is_contaminated():
+                self.define_neighbors(point)
+                for neighbor in point.neighbors:
+                    neighbor.contaminate(self.standard_contact["beta"])
+
+            # 4) Si deux points se touchent
+
+        # Continuer la simulation tant que tous les points ne sont pas vers le point attracteur
+        if not all_point_on_attractor:
             self.canvas.after(10, self.run_animation)
+        else:
+            print("-----------------  Fin de la simulation !  -----------------")
 
     def display(self):
         self.canvas.pack()
