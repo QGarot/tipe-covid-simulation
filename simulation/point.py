@@ -13,7 +13,7 @@ class Point:
         self.canvas = canvas
         self.diameter = diameter
         self.id = None
-        self.contamination = 0
+        self.contacts = []
         self.neighbors = []
 
     def add_neighbor(self, point):
@@ -67,6 +67,11 @@ class Point:
         return center.distance(self) <= radius
 
     def is_on_point(self, point):
+        """
+        Vérifie si le point self est sur le point indiqué en paramètre.
+        :param point:
+        :return:
+        """
         radius = point.get_diameter() / 2
         return self.is_in_ball(point, radius)
 
@@ -92,7 +97,7 @@ class Point:
 
     def get_color(self):
         """
-        Retourne la couleur du cercle
+        Retourne la couleur du point
         :return:
         """
         return self.color
@@ -114,6 +119,7 @@ class Point:
         y1 = self.get_y() + self.get_diameter()/2
 
         self.id = self.canvas.create_oval(x0, y0, x1, y1, fill=self.get_color())
+        # self.canvas.create_text(x0, y0, text=self.id)
 
     def change_color(self, color):
         self.color = color
@@ -121,14 +127,13 @@ class Point:
 
     def contaminate(self, beta):
         """
-        TODO: Vérifier si le point a déjà été susceptible d'etre contaminé par le même individu.
         Cette fonction modélise la contamination du point.
         :return:
         """
         # On ne contamine que les individus sains...
         if self.is_healthy():
             k = random()
-            # ... selon une probabilité beta
+            # ... avec une probabilité beta
             if k <= beta:
                 self.change_color("red")
                 print(str(self.id) + " a été contaminé !")

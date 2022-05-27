@@ -4,10 +4,13 @@ from simulation.point import Point
 
 
 class Simulation:
-    def __init__(self, height, width, strd_contact, point_data):
+    def __init__(self, height, width, strd_contact, point_data, scale):
         """
         Cette classe représente une fenêtre dans laquelle se déroulera la simulation.
-        # TODO : faire la liste des différents paramètres.
+        La simulation correspondra a une succession d'états permettant de mettre en évidence la transmission du virus :
+            A un certain état n, chaque point sera caractérisé par sa couleur et par sa position.
+            Le mouvement d'un point est réalisé grace au changement de ses coordonnées lors de la transition d'un état n
+            à un état n+1.
         """
 
         # Paramètres de la fenêtre
@@ -26,6 +29,9 @@ class Simulation:
         self.points = []
         self.vectors = []  # Contient les vecteurs déplacement de chaque point de la simulation.
                            # Il sont unitaires, dirigé et orienté vers le point attracteur.
+
+        self.contacts = []
+        self.scale = scale
 
     def SIR_data(self):
         s = 0
@@ -48,6 +54,30 @@ class Simulation:
         """
         colors = self.point_data["colors"]
         return random.choice(colors)
+
+    def add_contact(self, point1_id, point2_id):
+        """
+        Ajoute un contact à l'ensemble des contacts qui ont lieu au cours de la simulation.
+        :param point1_id:
+        :param point2_id:
+        :return:
+        """
+        self.contacts.append((point1_id, point2_id))
+
+    def contact_exist(self, point1_id, point2_id):
+        """
+        Cette méthode vérifie si les points dont les id sont rentrés en paramètres ont été en contact.
+
+        -> En effet, si à un certain état n il n'y a pas eu de contamination entre 2 points, il ne peut pas y en avoir à
+        l'état n+1 d'où l'utilité de vérifier si un contact a déjà eu lieu.
+        :param point2_id:
+        :param point1_id:
+        :return: booléen
+        """
+        for couple in self.contacts:
+            if couple == (point1_id, point2_id) or couple == (point2_id, point1_id):
+                return True
+        return False
 
     def generate_coord(self):
         """
@@ -79,6 +109,7 @@ class Simulation:
         """
         diameter = self.point_data["diameter"]
         self.create_attractor_point()
+
         for i in range(n):
             # On génère de manière aléatoire des coordonnées
             (x, y) = self.generate_coord()
@@ -86,7 +117,6 @@ class Simulation:
             # On crée le point pour ensuite le dessiner dans la fenêtre
             point = Point(x, y, diameter, self.generate_color(), self.canvas)
             point.draw()
-            # point.draw_vector(point.get_vector(self.attractor_point))
 
             # On met à jour les listes caractérisant la simulation
             self.points.append(point)
@@ -94,26 +124,12 @@ class Simulation:
 
         print("-----------------  Début de la simulation...  -----------------")
 
-    def define_neighbors(self, point0):
-        """
-        Met à jour la liste des voisins de point0.
-        Un point est considéré comme voisin de point0 s'il est situé à une distance inférieure à la distance de contact
-        de point0.
-        :param point0:
-        :return:
-        """
-        contact_distance = self.standard_contact["distance"]
-        for point in self.points:
-            if point.is_in_ball(point0, contact_distance * 20):
-                point0.add_neighbor(point)
-
     def run_animation(self):
         """
         TODO: Terminer l'animation.
         Déplacer tous les points vers le point attracteur tant qu'ils n'y sont pas.
         :return:
         """
-        print("***********")
         all_point_on_attractor = True
         n = len(self.points)
         for i in range(n):
@@ -125,17 +141,27 @@ class Simulation:
                 all_point_on_attractor = False
 
             # 2) Si le point d'indice i est rouge, mettre les points voisins en rouge sous certaines conditions...
-            if point.is_contaminated():
-                self.define_neighbors(point)
-                for neighbor in point.neighbors:
-                    neighbor.contaminate(self.standard_contact["beta"])
+            # if point.is_contaminated():
+            #    self.define_neighbors(point)
+            #    for neighbor in point.neighbors:
+            #        if not neighbor.contact_exist(point):
+            #            neighbor.contaminate(self.standard_contact["beta"])
+            #            # On enregistre le contact
+            #            neighbor.create_contact(point)
 
-            # 4) Si deux points se touchent
+            if point.is_contaminated():
+                for p in self.points:
+                    if p.is_in_ball(point, self.standard_contact["distance"] * self.scale) and p != point:
+                        if not self.contact_exist(point.id, p.id):
+                            p.contaminate(self.standard_contact["beta"])
+                            self.add_contact(p.id, point.id)
+                            print("contact!!!")
 
         # Continuer la simulation tant que tous les points ne sont pas vers le point attracteur
         if not all_point_on_attractor:
             self.canvas.after(10, self.run_animation)
         else:
+            print("Il y a eu " + str(len(self.contacts)) + " contacts !")
             print("-----------------  Fin de la simulation !  -----------------")
 
     def display(self):
