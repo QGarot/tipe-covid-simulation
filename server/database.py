@@ -1,9 +1,8 @@
 import mysql.connector
-from mysql.connector.cursor import MySQLCursor
 
 
 class Database:
-    def __init__(self, host: str, user: str, password: str, database_name: str) -> None:
+    def __init__(self, host, user, password, database_name):
         """
         Cette classe permet de gèrer les actions effectuées sur la base de données sélectionnée.
 
@@ -22,7 +21,7 @@ class Database:
 
         self.cursor = self.connection.cursor()
 
-    def get_cursor(self) -> MySQLCursor:
+    def get_cursor(self):
         """
         Le curseur est un objet permettant d'éxécuter des requêtes SQL.
 
@@ -30,30 +29,47 @@ class Database:
         """
         return self.cursor
 
-    def set(self, sql: str, values: tuple) -> None:
+    def update(self, table_name, attribute, new_value, condition):
         """
-        Permet d'éxécuter une requête SQL pour modifier table.
-        
-        - INSERT
-        - UPDATE
-        - DELETE
+        Permet de mettre à jour des données.
+        :param table_name:
+        :param attribute:
+        :param new_value:
+        :param condition:
+        :return:
+        """
+        sql = "UPDATE " + table_name + " SET " + attribute + " = '" + new_value + "' WHERE " + condition
+        self.get_cursor().execute(sql)
+        self.connection.commit()
 
-        :param values: Valeurs
-        :param sql: Requête SQL
+    def insert(self, table_name, structure, values):
+        """
+        Permet d'enregistrer des valeurs dans la table table_name.
+
+        :param table_name: Nom de la table
+        :param structure: Structure de la table
+        :param values: Les attributs sous forme de liste ou de tuple
         :return: None
         """
-        self.get_cursor().execute(sql, values)
+        sql = "INSERT INTO " + table_name + " " + structure + " VALUES " + str(values)
+        self.get_cursor().execute(sql)
         self.connection.commit()
-        return None
 
-    def get(self, sql: str) -> list:
+    def select(self, attributes, table_name, condition=None):
         """
-        Retourne une liste correspondant aux enregistrements retournés par la requête (généralement de type SELECT).
+        Retourne une liste correspondant aux enregistrements retournés par la requête.
         Cette liste contient des n-uplets si n attributs sont sélectionnés dans la requête.
 
-        :param sql: Requête SQL
+        :param condition:
+        :param table_name:
+        :param attributes:
         :return: list
         """
+        if condition is not None:
+            sql = "SELECT " + attributes + " FROM " + table_name + " WHERE " + condition
+        else:
+            sql = "SELECT " + attributes + " FROM " + table_name
+
         self.get_cursor().execute(sql)
         result = self.get_cursor().fetchall()
         return result

@@ -1,8 +1,12 @@
-class HealthDataUser:
-    def __init__(self):
+from server.database import Database
+from random import uniform
+
+
+class HealthData:
+    def __init__(self, user_id, db):
         """
         Cette classe permet de générer pour tout individu un objet contenant les données de santé essentielles.
-        Pour ce travail on se limite à 3 types de données de santé :
+        Pour ce travail on se limite à 3 types de données de santé, enregistrés dans une bdd :
         - Le premier correspond aux données de santé à caractère personnel (antécédents médicaux, maladies, traitements,
           handicap, etc...)
 
@@ -11,43 +15,20 @@ class HealthDataUser:
 
         - Le troisième correspond à des données de contextualisation de la santé relative à l'individu (IMC,
         alimentation, consommation d'alcool/tabac, catégorie socioprofessionnelle, l'appartenance à une classe scolaire)
+
+        # Les objets issus de cette classe sont construits à partir de la structure de la BDD #
         """
 
-        self.user_id = None
+        self.user_id = user_id
+        self.nb_types = len(db.select("id", "donnee_de_sante_categories"))
+        self.data_health_types = [{} for _ in range(self.nb_types)]
 
-        self.type1 = {
-            "medical_background": None,
-            "disease": None,
-            "treatment": None,
-            "handicap": None
-        }
-
-        self.type2 = {
-            # Les qualités sont évaluées sur une échelle de 0 à 10
-            "environmental_quality": None,
-        }
-
-        self.type3 = {
-            # Body Mass Index = bmi = IMC
-            "bmi": None,
-            "alcohol": None,
-            "tobacco": None,
-            "school": None,
-            "socio_professional_category": None,
-        }
-
-    def test(self, db):
-        """
-        générer la structure de la classe grace à la bdd :
-        :return:
-        """
-
-        data_types_id = [i for i in db.get("SELECT id FROM donnee_de_sante_categories")]
-        for id in data_types_id:
-            data = db.get("SELECT nom FROM données_de_sante WHERE categorie = " + str(id))
-            type = {}
-            for name in data:
-                type[name] = None
+        for i in range(self.nb_types):
+            category_id = i + 1
+            health_data = db.select("id", "données_de_sante", "categorie = " + str(category_id))
+            for n_tuple in health_data:
+                id = n_tuple[0]
+                self.data_health_types[i][id] = None
 
     def generate(self):
         """
@@ -55,10 +36,37 @@ class HealthDataUser:
         Cette fonction génère des valeurs correspondant au types 1, 2 et 3 de manière aléatoire
         :return:
         """
-        pass
+        for data_health_type in self.data_health_types:
+            for id in data_health_type.keys():
+                data_health_type[id] = round(uniform(0, 1))
+
+    def set_health_data(self, health_data_id, new_value):
+        """
+        Permet d'assigner une nouvelle valeur correspondant à la donnée de santé dont l'id est renseigné en paramètre.
+        :param health_data_id:
+        :param new_value:
+        :return:
+        """
+        for health_data_type in self.data_health_types:
+            if health_data_id in health_data_type.keys():
+                health_data_type[health_data_id] = new_value
+
+    def set_extra_data(self, db, health_data_id, info):
+        """
+        Permet d'ajouter des informations supplémentaires à un utilisateur selon une certaine donnée de santé.
+        :param db:
+        :param health_data_id:
+        :param info:
+        :return:
+        """
+        table_name = "utilisateurs_données_de_sante"
+        attribute = "info_supplementaire"
+        new_value = info
+        condition = "donnee_id = " + str(health_data_id) + " AND utilisateur_id = " + str(self.user_id)
+        db.update(table_name, attribute, new_value, condition)
 
     @staticmethod
-    def get_db_attributes() -> str:
+    def get_db_attributes():
         """
         Retourne la chaîne de caractère correspondant aux attributs de la table 'utilisateurs_données_de_sante'.
 
@@ -66,42 +74,16 @@ class HealthDataUser:
         """
         return "(utilisateur_id, donnee_id, valeur, info_supplementaire)"
 
-    def get_personal_health_data(self):
-        return self.type1
-
-    def get_extrinsic_factors(self):
-        return self.type2
-
-    def get_contextualization_health_data(self):
-        return self.type3
-
-    def insert_db(self, db):
+    def insert_in_db(self, db):
         """
-        TODO:
+        Cette méthode permet d'ajouter les données de santé enregistrées dans cet objet dans la table
+        utilisateurs_données_de_sante.
         :param db:
         :return:
         """
-
-        data_id = 1
-
-        # Liste de tuples de la forme (utilisateur_id, donnee_id, valeur, info_supplémentaire).
-        values = []
-
-        # Insertion des valeurs correspondant au type1
-        for value in self.type1.values():
-            values.append((self.user_id, data_id, value, ""))
-            data_id = data_id + 1
-
-        # Insertion des valeurs correspondant au type2
-        for value in self.type2.values():
-            values.append((self.user_id, data_id, value, ""))
-            data_id = data_id + 1
-
-        # Insertion des valeurs correspondant au type3
-        for value in self.type3.values():
-            values.append((self.user_id, data_id, value, ""))
-            data_id = data_id + 1
-
-        request = "INSERT INTO users " + self.get_db_attributes() + " VALUES (%s, %s, %s, %s)"
-        db.set()
-
+        table_name = "utilisateurs_données_de_sante"
+        structure = self.get_db_attributes()
+        for data_health_type in self.data_health_types:
+            for health_data_id, health_data_value in data_health_type.items():
+                value = (self.user_id, health_data_id, health_data_value, "")
+                db.insert(table_name, structure, value)

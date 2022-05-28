@@ -1,5 +1,6 @@
 import math
 from random import random
+from server.user import User
 
 
 class Point:
@@ -15,6 +16,29 @@ class Point:
         self.id = None
         self.contacts = []
         self.neighbors = []
+        self.user = None
+
+    def create_user(self, db):
+        """
+        Chaque point modélise un individu. On associe alors à chaque objet de type point un individu possédant des
+        données de santé générées aléatoirement.
+        :param db:
+        :return:
+        """
+        if self.is_contaminated():
+            self.user = User(self.id, "Infecté")
+        elif self.is_healthy():
+            self.user = User(self.id, "Sain")
+        else:
+            self.user = User(self.id, "Rétabli")
+
+        self.user.initialize_health_data(db)
+
+        # On ajoute l'utilisateur dans la BDD
+        self.user.insert_in_db(db)
+
+        # On y ajoute également ses données de santé
+        self.user.get_health_data().insert_in_db(db)
 
     def add_neighbor(self, point):
         """

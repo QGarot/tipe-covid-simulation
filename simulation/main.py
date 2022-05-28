@@ -1,4 +1,5 @@
 from simulation.simulationc import Simulation
+from server.database import Database
 
 
 # --------------------- Paramètres --------------------- #
@@ -19,9 +20,11 @@ point_data = {
     "diameter_attractor": 200
 }
 
+db = Database("localhost", "root", "", "tipe")
+
 # --------------------- Simulation --------------------- #
 
-sim = Simulation(height, width, stantard_contact, point_data, scale)
+sim = Simulation(height, width, stantard_contact, point_data, scale, db)
 sim.put_points(n)
 sim.display()
 

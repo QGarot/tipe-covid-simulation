@@ -4,7 +4,7 @@ from simulation.point import Point
 
 
 class Simulation:
-    def __init__(self, height, width, strd_contact, point_data, scale):
+    def __init__(self, height, width, strd_contact, point_data, scale, db):
         """
         Cette classe représente une fenêtre dans laquelle se déroulera la simulation.
         La simulation correspondra a une succession d'états permettant de mettre en évidence la transmission du virus :
@@ -32,6 +32,9 @@ class Simulation:
 
         self.contacts = []
         self.scale = scale
+
+        # Base de données
+        self.db = db
 
     def SIR_data(self):
         s = 0
@@ -114,9 +117,11 @@ class Simulation:
             # On génère de manière aléatoire des coordonnées
             (x, y) = self.generate_coord()
 
-            # On crée le point pour ensuite le dessiner dans la fenêtre
+            # On crée le point pour ensuite le dessiner dans la fenêtre..
             point = Point(x, y, diameter, self.generate_color(), self.canvas)
             point.draw()
+            # ..Après l'avoir dessiné, on peut lui associer un utilisateur qui possedera un ensemble de données de santé
+            point.create_user(self.db)
 
             # On met à jour les listes caractérisant la simulation
             self.points.append(point)
@@ -126,7 +131,6 @@ class Simulation:
 
     def run_animation(self):
         """
-        TODO: Terminer l'animation.
         Déplacer tous les points vers le point attracteur tant qu'ils n'y sont pas.
         :return:
         """
@@ -141,14 +145,6 @@ class Simulation:
                 all_point_on_attractor = False
 
             # 2) Si le point d'indice i est rouge, mettre les points voisins en rouge sous certaines conditions...
-            # if point.is_contaminated():
-            #    self.define_neighbors(point)
-            #    for neighbor in point.neighbors:
-            #        if not neighbor.contact_exist(point):
-            #            neighbor.contaminate(self.standard_contact["beta"])
-            #            # On enregistre le contact
-            #            neighbor.create_contact(point)
-
             if point.is_contaminated():
                 for p in self.points:
                     if p.is_in_ball(point, self.standard_contact["distance"] * self.scale) and p != point:
