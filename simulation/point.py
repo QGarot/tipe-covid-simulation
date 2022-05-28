@@ -36,7 +36,6 @@ class Point:
 
         # On ajoute l'utilisateur dans la BDD
         self.user.insert_in_db(db)
-
         # On y ajoute également ses données de santé
         self.user.get_health_data().insert_in_db(db)
 
@@ -152,6 +151,7 @@ class Point:
     def contaminate(self, beta):
         """
         Cette fonction modélise la contamination du point.
+        Retourne 1 s'il y a eu contamination, 0 sinon.
         :return:
         """
         # On ne contamine que les individus sains...
@@ -161,5 +161,9 @@ class Point:
             if k <= beta:
                 self.change_color("red")
                 print(str(self.id) + " a été contaminé !")
+                return 1
             else:
                 print(str(self.id) + " n'a pas été contaminé !")
+                return 0
+        else:
+            return 0

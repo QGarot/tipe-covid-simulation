@@ -1,6 +1,7 @@
 import tkinter as tk
 import random
 from simulation.point import Point
+from server.contact import Contact
 
 
 class Simulation:
@@ -147,11 +148,16 @@ class Simulation:
             # 2) Si le point d'indice i est rouge, mettre les points voisins en rouge sous certaines conditions...
             if point.is_contaminated():
                 for p in self.points:
-                    if p.is_in_ball(point, self.standard_contact["distance"] * self.scale) and p != point:
-                        if not self.contact_exist(point.id, p.id):
-                            p.contaminate(self.standard_contact["beta"])
-                            self.add_contact(p.id, point.id)
-                            print("contact!!!")
+                    condition1 = p.is_in_ball(point, self.standard_contact["distance"] * self.scale)
+                    condition2 = p != point
+                    condition3 = not self.contact_exist(point.id, p.id)
+                    if condition1 and condition2 and condition3:
+                        contamination = p.contaminate(self.standard_contact["beta"])
+                        self.add_contact(p.id, point.id)
+
+                        # On créé un objet permettant de symboliser le contact, pour ensuite l'enregistrer dans la BDD
+                        contact = Contact((point.id, p.id), contamination)
+                        contact.insert_in_db(self.db)
 
         # Continuer la simulation tant que tous les points ne sont pas vers le point attracteur
         if not all_point_on_attractor:

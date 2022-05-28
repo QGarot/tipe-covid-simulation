@@ -1,12 +1,7 @@
-import datetime
-from server.database import Database
-
-
 class Contact:
-    def __init__(self, users: tuple, region: str):
+    def __init__(self, users, contamination):
         self.users = users
-        self.region = region
-        self.date = datetime.date.today()
+        self.contamination = contamination
 
     @staticmethod
     def get_db_attributes() -> str:
@@ -15,24 +10,13 @@ class Contact:
 
         :return: str
         """
-        return "(userid1, userid2, region, date)"
+        return "(utilisateur1_id, utilisateur2_id, contamination)"
         
     def get_values(self):
-        return self.get_users()[0], self.get_users()[1], self.get_region(), self.get_date()
+        return self.get_users()[0], self.get_users()[1], self.contamination
 
-    def get_users(self) -> tuple:
+    def get_users(self):
         return self.users
-
-    def get_region(self) -> str:
-        return self.region
-
-    def get_date(self) -> datetime.date:
-        return self.date
         
-    def insert_db(self, db: Database) -> None:
-        """
-        """
-        
-        request = "INSERT INTO contacts " + self.get_db_attributes() + " VALUES (%s, %s, %s, %s)"
-        db.set(request, self.get_values())
-        print("OK!")
+    def insert_in_db(self, db):
+        db.insert("contact", self.get_db_attributes(), self.get_values())
