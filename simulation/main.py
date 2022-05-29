@@ -6,9 +6,9 @@ from server.database import Database
 
 height = 700
 width = 700
-scale = 35  # 25 pixels sur le dessin représente 1 mètre
+scale = 15  # 25 pixels sur le dessin représente 1 mètre
 point_dimension = scale  # ODG Individu : 1m
-n = 5  # Nombre d'individus à représenter
+n = 40  # Nombre d'individus à représenter
 
 stantard_contact = {
     "distance": 1,  # distance inférieure ou égale à 1 mètre en cas de contact...
@@ -18,7 +18,7 @@ stantard_contact = {
 point_data = {
     "diameter": point_dimension,
     "colors": ["green", "orange", "red"],
-    "diameter_attractor": 200
+    "diameter_attractor": 100
 }
 
 db = Database("localhost", "root", "", "tipe")
