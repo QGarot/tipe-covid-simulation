@@ -14,8 +14,6 @@ class Point:
         self.canvas = canvas
         self.diameter = diameter
         self.id = None
-        self.contacts = []
-        self.neighbors = []
         self.user = None
 
     def create_user(self, db):
@@ -38,16 +36,6 @@ class Point:
         self.user.insert_in_db(db)
         # On y ajoute également ses données de santé
         self.user.get_health_data().insert_in_db(db)
-
-    def add_neighbor(self, point):
-        """
-        Pour simplifier, on considère que si un point devient voisin d'un autre, alors il le reste jusqu'à la fin de
-        la simulation (supposition cohérente puisque les points bougent à la même vitesse vers la même destination).
-        :param point:
-        :return:
-        """
-        if point not in self.neighbors:
-            self.neighbors.append(point)
 
     def is_contaminated(self):
         return self.color == "red"
