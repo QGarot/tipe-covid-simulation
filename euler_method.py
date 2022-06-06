@@ -40,7 +40,6 @@ def sir(points, tf, beta, gamma, y):
         deriv_i = beta * i * s - gamma * i
         deriv_r = gamma * i
 
-    print(s, i, r)
     return t, y
 
 
@@ -55,8 +54,9 @@ plt.title("Evolution de la taille des 3 catégories de personnes au cours du tem
 plt.xlabel("Temps (en jours)")
 plt.ylabel("Population")
 
-plt.scatter(t, s, marker=".")
-plt.scatter(t, i, marker=".")
-plt.scatter(t, r, marker=".")
+plt.scatter(t, s, marker=".", label="Sains")
+plt.scatter(t, i, marker=".", label="Infectés")
+plt.scatter(t, r, marker=".", label="Rétablis")
 
+plt.legend()
 plt.show()
